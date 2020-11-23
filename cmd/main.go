@@ -80,8 +80,7 @@ func main() {
 			Name: fmt.Sprintf("%s", *prefix),
 			Help: "bash exporter metrics",
 		},
-	 []string{"verb", "job"},
-		labelsArr,
+	 	labelsArr,
 	)
 	prometheus.MustRegister(verbMetrics)
 
