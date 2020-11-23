@@ -11,7 +11,7 @@ import (
 	"strings"
 	"sync"
 	"time"
-	"github.com/prometheus/client_golang/prometheus/promhttp"
+	"github.com/prometheus/client_golang/tree/master/prometheus/promhttp"
 )
 
 var (
