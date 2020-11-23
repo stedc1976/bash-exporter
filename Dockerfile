@@ -1,6 +1,6 @@
-FROM golang:1.10.1
+FROM golang:1.15.5
 #add dependencies to current module
-RUN go get -d -v github.com/stedc1976/bash-exporter/cmd
+RUN go get -d -v -insecure github.com/stedc1976/bash-exporter/cmd
 WORKDIR /go/src/github.com/stedc1976/bash-exporter/cmd
 #compile packages and dependencies present into the module and write the resulting executable to the bash-exporter file
 RUN CGO_ENABLED=0 GOOS=linux go build -a -installsuffix cgo -o bash-exporter .
@@ -12,4 +12,5 @@ RUN mkdir -p scripts
 COPY --from=0 /go/src/github.com/stedc1976/bash-exporter/cmd/bash-exporter .
 # copy script files
 COPY ./scripts/*.sh ./scripts/
+
 CMD ["./bash-exporter"]
