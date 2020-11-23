@@ -4,6 +4,7 @@ import (
 	// "encoding/json"
 	"encoding/json"
 	"flag"
+	"fmt"
 	"io/ioutil"
 	"log"
 	"os/exec"
@@ -56,10 +57,8 @@ func (o *Output) RunExec(path *string) {
 
 func main() {
 	//addr := flag.String("web.listen-address", ":9300", "Address on which to expose metrics")
-	//interval := flag.Int("interval", 300, "Interval for metrics collection in seconds")
-	interval := flag.Int("interval", 3, "Interval for metrics collection in seconds")
-	//path := flag.String("path", "./scripts", "path to directory with bash scripts")
-	path := flag.String("path", "./scripts-windows", "path to directory with bash scripts")
+	interval := flag.Int("interval", 5, "Interval for metrics collection in seconds")
+	path := flag.String("path", "./scripts", "path to directory with bash scripts")
 	labels := flag.String("labels", "hostname,env", "additioanal labels")
 	//prefix := flag.String("prefix", "bash", "Prefix for metrics")
 	debug := flag.Bool("debug", false, "Debug log level")
@@ -117,14 +116,15 @@ func Run(interval int, path string, names []string, labelsArr []string, debug bo
 			go o.RunJob(&p)
 		}
 		wg.Wait()
-		// if debug == true {
-		// 	ser, err := json.Marshal(o)
-		// 	if err != nil {
-		// 		log.Println(err)
-		// 	}
-		// 	log.Println(string(ser))
-		// }
 		//verbMetrics.Reset()
+		//if debug == true {
+		//	ser, err := json.Marshal(o)
+		//	if err != nil {
+		//		log.Println(err)
+		//	}
+		//	log.Println(string(ser))
+		//}
+
 		for _, o := range oArr {
 
 			for metric, value := range o.Schema.Results {
@@ -135,8 +135,9 @@ func Run(interval int, path string, names []string, labelsArr []string, debug bo
 				}
 				o.Schema.Labels["verb"] = metric
 				o.Schema.Labels["job"] = o.Job
+				log.Println("verbMetrics")
 				log.Println(o.Schema.Labels)
-				log.Println(value)
+				log.Println(fmt.Sprintf("%f", float64(value)))
 				//verbMetrics.With(prometheus.Labels(o.Schema.Labels)).Set(float64(value))
 			}
 		}
