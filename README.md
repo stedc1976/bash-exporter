@@ -23,6 +23,10 @@ bash{env="",hostname="node-1",job="job-2",verb="put"} 0.13
 bash{env="",hostname="node-1",job="job-2",verb="time"} 0.5
 bash{env="dev",hostname="",job="job-1",verb="items"} 21
 ```
+```console
+$ curl -s 127.1:9300/metrics | grep ^log_file_raw_count
+log_file_raw_count{pod_name="samigrationpam-kieserver-26-build",namespace="service-activator",container_name="sti-build"} 3596 1605829267522
+```
 
 ## Usage
 
