@@ -17,7 +17,7 @@ import (
 )
 
 var (
-   verbMetrics *prometheus.GaugeVec
+   verbMetrics *prometheus.NewGauge
 )
 
 // Type Params stores parameters.
