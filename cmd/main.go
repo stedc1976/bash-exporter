@@ -1,6 +1,7 @@
 package main
 
 import (
+	// "encoding/json"
 	"encoding/json"
 	"flag"
 	"fmt"
@@ -17,10 +18,11 @@ import (
 )
 
 var (
-	bashMetrics = prometheus.NewGauge(prometheus.GaugeOpts{
+	bashMetric = prometheus.NewGaugeVec(prometheus.GaugeOpts{
 		Name: "bash_metric",
 		Help: "bash exporter metrics",
-	})
+	}, []string{"podname", "namespace", "container_name"},
+	)
 )
 
 // Type Params stores parameters.
@@ -65,20 +67,13 @@ func main() {
 	addr := flag.String("web.listen-address", ":9300", "Address on which to expose metrics")
 	interval := flag.Int("interval", 5, "Interval for metrics collection in seconds")
 	path := flag.String("path", "./scripts", "path to directory with bash scripts")
-	labels := flag.String("labels", "hostname,env", "additioanal labels")
 	debug := flag.Bool("debug", false, "Debug log level")
 	flag.Parse()
 
-	var labelsArr []string
-
-	labelsArr = strings.Split(*labels, ",")
-	labelsArr = append(labelsArr, "verb", "job")
-
-	log.Println("Labels:")
-	log.Println(labelsArr)
+	labelsArr := []string{"podname", "namespace", "container_name"}
 
 	// Metrics have to be registered to be exposed:
-	prometheus.MustRegister(bashMetrics)
+	prometheus.MustRegister(bashMetric)
 
 	files, err := ioutil.ReadDir(*path)
 	if err != nil {
@@ -114,7 +109,8 @@ func Run(interval int, path string, names []string, labelsArr []string, debug bo
 			go o.RunJob(&p)
 		}
 		wg.Wait()
-		bashMetrics.Reset()
+		bashMetric.Reset()
+		bashMetric.SetToCurrentTime()
 		//if debug == true {
 		//	ser, err := json.Marshal(o)
 		//	if err != nil {
@@ -136,7 +132,8 @@ func Run(interval int, path string, names []string, labelsArr []string, debug bo
 				log.Println("bashMetrics")
 				log.Println(o.Schema.Labels)
 				log.Println(fmt.Sprintf("%f", float64(value)))
-				bashMetrics.With(prometheus.Labels(o.Schema.Labels)).Set(float64(value))
+				bashMetric.With(prometheus.Labels(o.Schema.Labels)).Set(float64(value))
+				bashMetric.SetToCurrentTime()
 			}
 		}
 		time.Sleep(time.Duration(interval) * time.Second)
