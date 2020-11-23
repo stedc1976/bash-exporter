@@ -56,7 +56,7 @@ func (o *Output) RunExec(path *string) {
 }
 
 func main() {
-	//addr := flag.String("web.listen-address", ":9300", "Address on which to expose metrics")
+	addr := flag.String("web.listen-address", ":9300", "Address on which to expose metrics")
 	interval := flag.Int("interval", 5, "Interval for metrics collection in seconds")
 	path := flag.String("path", "./scripts", "path to directory with bash scripts")
 	labels := flag.String("labels", "hostname,env", "additioanal labels")
@@ -97,9 +97,9 @@ func main() {
 	log.Println("Bash scripts found:")
 	log.Println(names)
 
-	//http.Handle("/metrics", promhttp.Handler())
+	http.Handle("/metrics", promhttp.Handler())
 	go Run(int(*interval), *path, names, labelsArr, *debug)
-	//log.Fatal(http.ListenAndServe(*addr, nil))
+	log.Fatal(http.ListenAndServe(*addr, nil))
 }
 
 func Run(interval int, path string, names []string, labelsArr []string, debug bool) {
