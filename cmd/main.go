@@ -110,7 +110,6 @@ func Run(interval int, path string, names []string, labelsArr []string, debug bo
 		}
 		wg.Wait()
 		bashMetric.Reset()
-		bashMetric.SetToCurrentTime()
 		//if debug == true {
 		//	ser, err := json.Marshal(o)
 		//	if err != nil {
@@ -127,13 +126,12 @@ func Run(interval int, path string, names []string, labelsArr []string, debug bo
 						o.Schema.Labels[label] = ""
 					}
 				}
-				o.Schema.Labels["verb"] = metric
-				o.Schema.Labels["job"] = o.Job
+				log.Println("metric: " + metric)
+				log.Println("job: " + o.Job)
 				log.Println("bashMetrics")
 				log.Println(o.Schema.Labels)
 				log.Println(fmt.Sprintf("%f", float64(value)))
 				bashMetric.With(prometheus.Labels(o.Schema.Labels)).Set(float64(value))
-				bashMetric.SetToCurrentTime()
 			}
 		}
 		time.Sleep(time.Duration(interval) * time.Second)
