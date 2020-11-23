@@ -1,23 +1,26 @@
 package main
 
 import (
-	// "encoding/json"
 	"encoding/json"
 	"flag"
 	"fmt"
 	"io/ioutil"
 	"log"
+	"net/http"
 	"os/exec"
 	"strings"
 	"sync"
 	"time"
-	
+
 	"github.com/prometheus/client_golang/prometheus"
 	"github.com/prometheus/client_golang/prometheus/promhttp"
 )
 
 var (
-   verbMetrics *prometheus.NewGauge
+	bashMetrics = prometheus.NewGauge(prometheus.GaugeOpts{
+		Name: "bash_metric",
+		Help: "bash exporter metrics",
+	})
 )
 
 // Type Params stores parameters.
@@ -63,7 +66,6 @@ func main() {
 	interval := flag.Int("interval", 5, "Interval for metrics collection in seconds")
 	path := flag.String("path", "./scripts", "path to directory with bash scripts")
 	labels := flag.String("labels", "hostname,env", "additioanal labels")
-	prefix := flag.String("prefix", "bash", "Prefix for metrics")
 	debug := flag.Bool("debug", false, "Debug log level")
 	flag.Parse()
 
@@ -75,12 +77,8 @@ func main() {
 	log.Println("Labels:")
 	log.Println(labelsArr)
 
-	verbMetrics = prometheus.NewGauge(prometheus.GaugeOpts{
-		Name: fmt.Sprintf("%s", *prefix),
-		Help: "bash exporter metrics",
-	})
-	
-	prometheus.MustRegister(verbMetrics)
+	// Metrics have to be registered to be exposed:
+	prometheus.MustRegister(bashMetrics)
 
 	files, err := ioutil.ReadDir(*path)
 	if err != nil {
@@ -116,7 +114,7 @@ func Run(interval int, path string, names []string, labelsArr []string, debug bo
 			go o.RunJob(&p)
 		}
 		wg.Wait()
-		verbMetrics.Reset()
+		bashMetrics.Reset()
 		//if debug == true {
 		//	ser, err := json.Marshal(o)
 		//	if err != nil {
@@ -135,10 +133,10 @@ func Run(interval int, path string, names []string, labelsArr []string, debug bo
 				}
 				o.Schema.Labels["verb"] = metric
 				o.Schema.Labels["job"] = o.Job
-				log.Println("verbMetrics")
+				log.Println("bashMetrics")
 				log.Println(o.Schema.Labels)
 				log.Println(fmt.Sprintf("%f", float64(value)))
-				verbMetrics.With(prometheus.Labels(o.Schema.Labels)).Set(float64(value))
+				bashMetrics.With(prometheus.Labels(o.Schema.Labels)).Set(float64(value))
 			}
 		}
 		time.Sleep(time.Duration(interval) * time.Second)
