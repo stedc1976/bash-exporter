@@ -75,12 +75,11 @@ func main() {
 	log.Println("Labels:")
 	log.Println(labelsArr)
 
-	verbMetrics = prometheus.NewGaugeVec(
-		prometheus.GaugeOpts{
-			Name: fmt.Sprintf("%s", *prefix),
-			Help: "bash exporter metrics",
-		}, labelsArr)
-	)
+	verbMetrics = prometheus.NewGauge(prometheus.GaugeOpts{
+		Name: fmt.Sprintf("%s", *prefix),
+		Help: "bash exporter metrics",
+	})
+	
 	prometheus.MustRegister(verbMetrics)
 
 	files, err := ioutil.ReadDir(*path)
