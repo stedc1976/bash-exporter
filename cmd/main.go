@@ -79,8 +79,7 @@ func main() {
 		prometheus.GaugeOpts{
 			Name: fmt.Sprintf("%s", *prefix),
 			Help: "bash exporter metrics",
-		},
-	 	labelsArr,
+		}, labelsArr)
 	)
 	prometheus.MustRegister(verbMetrics)
 
