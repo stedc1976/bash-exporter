@@ -5,7 +5,7 @@ WORKDIR /go/src/github.com/stedc1976/bash-exporter/cmd
 #compile packages and dependencies present into the module and write the resulting executable to the bash-exporter file
 RUN CGO_ENABLED=0 GOOS=linux go build -a -installsuffix cgo -o bash-exporter .
 
-FROM alpine:3.7
+FROM alpine:3.12
 WORKDIR /root
 RUN mkdir -p scripts
 # copy executable file
