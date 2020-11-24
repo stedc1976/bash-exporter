@@ -18,14 +18,9 @@ $ docker run -d -p 9300:9300 --name my_bash-exporter diclem27/bash-exporter:1.0.
 
 ```console
 $ curl -s 127.1:9300/metrics | grep ^bash
-bash{env="",hostname="node-1",job="job-2",verb="get"} 0.003
-bash{env="",hostname="node-1",job="job-2",verb="put"} 0.13
-bash{env="",hostname="node-1",job="job-2",verb="time"} 0.5
-bash{env="dev",hostname="",job="job-1",verb="items"} 21
-```
-```console
-$ curl -s 127.1:9300/metrics | grep ^log_file_raw_count
-log_file_raw_count{pod_name="samigrationpam-kieserver-26-build",namespace="service-activator",container_name="sti-build"} 3596 1605829267522
+bash{container_name="sti-build",job="job1",namespace="service-activator",pod_name="samigrationpam-kieserver-26-build",verb:"row_count"} 3596
+bash{container_name="sti-build",job="job1",namespace="service-activator",pod_name="samigrationpam-kieserver-26-build",verb:"row_count"} 3721
+bash{container_name="sti-build",job="job1",namespace="service-activator",pod_name="samigrationpam-kieserver-26-build",verb:"row_count"} 3802
 ```
 
 ## Usage
@@ -35,29 +30,18 @@ Usage of ./bash-exporter:
   -debug
     	Debug log level
   -interval int
-    	Interval for metrics collection in seconds (default 300)
-  -labels string
-    	additioanal labels (default "hostname,env")
+    	Interval for metrics collection in seconds (default 5)
   -path string
     	path to directory with bash scripts (default "/scripts")
-  -prefix string
-    	Prefix for metrics (default "bash")
   -web.listen-address string
     	Address on which to expose metrics (default ":9300")
 ```
 
-Just point `-path` flag to the directory with your bash scripts. Names of the files (`(.*).sh`) will be used as the `job` label. Bash scripts should return valid json (see [examples](https://github.com/stedc1976/bash-exporter)).
+Just point `-path` flag to the directory with your bash scripts. Names of the files (`(.*).sh`) will be used as the `job` label. Bash scripts should return valid json.
 
-Example output:
-```console
-# HELP bash bash exporter metrics
-# TYPE bash gauge
-bash{job="job-1",verb="items"} 21
-bash{job="job-2",verb="get"} 0.003
-bash{job="job-2",verb="put"} 0.13
-bash{job="job-2",verb="time"} 0.5
-...
-```
+## External doc
+
+https://godoc.org/github.com/prometheus/client_golang/prometheus
 
 ## TODO
 - [] Helm Chart
