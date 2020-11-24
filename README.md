@@ -7,13 +7,13 @@ Simple & minimalistic Prometheus exporter for bash scripts.
 ## Installation
 
 ```console
-$ docker build --rm -t diclem27/bash-exporter:1.0.0 .
+$ docker build --rm -t bash-exporter:1.0.0 .
 ```
 
 ## Docker quick start
 
 ```console
-$ docker run -d -p 9300:9300 --name my_bash-exporter diclem27/bash-exporter:1.0.0
+$ docker run -d -p 9300:9300 --name my_bash-exporter bash-exporter:1.0.0
 ```
 
 ```console
