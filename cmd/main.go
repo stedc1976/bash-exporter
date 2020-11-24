@@ -4,7 +4,6 @@ import (
 	// "encoding/json"
 	"encoding/json"
 	"flag"
-	"fmt"
 	"io/ioutil"
 	"log"
 	"net/http"
@@ -19,9 +18,9 @@ import (
 
 var (
 	bashMetric = prometheus.NewGaugeVec(prometheus.GaugeOpts{
-		Name: "bash_metric",
+		Name: "bash",
 		Help: "bash exporter metrics",
-	}, []string{"podname", "namespace", "container_name"},
+	}, []string{"pod_name", "namespace", "container_name"},
 	)
 )
 
@@ -38,8 +37,8 @@ type Output struct {
 }
 
 type Schema struct {
-	Results map[string]float64 `json:"results"`
-	Labels  map[string]string  `json:"labels"`
+	Results map[string]int64  `json:"results"`
+	Labels  map[string]string `json:"labels"`
 }
 
 func (o *Output) RunJob(p *Params) {
@@ -67,10 +66,10 @@ func main() {
 	addr := flag.String("web.listen-address", ":9300", "Address on which to expose metrics")
 	interval := flag.Int("interval", 5, "Interval for metrics collection in seconds")
 	path := flag.String("path", "./scripts", "path to directory with bash scripts")
-	debug := flag.Bool("debug", false, "Debug log level")
+	debug := flag.Bool("debug", true, "Debug log level")
 	flag.Parse()
 
-	labelsArr := []string{"podname", "namespace", "container_name"}
+	labelsArr := []string{"pod_name", "namespace", "container_name"}
 
 	// Metrics have to be registered to be exposed:
 	prometheus.MustRegister(bashMetric)
@@ -110,28 +109,23 @@ func Run(interval int, path string, names []string, labelsArr []string, debug bo
 		}
 		wg.Wait()
 		bashMetric.Reset()
-		//if debug == true {
-		//	ser, err := json.Marshal(o)
-		//	if err != nil {
-		//		log.Println(err)
-		//	}
-		//	log.Println(string(ser))
-		//}
 
 		for _, o := range oArr {
-
 			for metric, value := range o.Schema.Results {
 				for _, label := range labelsArr {
 					if _, ok := o.Schema.Labels[label]; !ok {
 						o.Schema.Labels[label] = ""
 					}
 				}
-				log.Println("metric: " + metric)
-				log.Println("job: " + o.Job)
-				log.Println("bashMetrics")
-				log.Println(o.Schema.Labels)
-				log.Println(fmt.Sprintf("%f", float64(value)))
-				bashMetric.With(prometheus.Labels(o.Schema.Labels)).Set(float64(value))
+				o.Schema.Labels["verb"] = metric
+				o.Schema.Labels["job"] = o.Job
+
+				if debug == true {
+					log.Println(o.Schema.Labels)
+					log.Println(int64(value))
+				}
+
+				bashMetric.With(prometheus.Labels(o.Schema.Labels)).Set(float64(int64(value)))
 			}
 		}
 		time.Sleep(time.Duration(interval) * time.Second)
