@@ -17,7 +17,7 @@ $ docker run -d -p 9300:9300 --name my_bash-exporter diclem27/bash-exporter:1.0.
 ```
 
 ```console
-$ curl -s 127.1:9300/metrics | grep ^bash
+$ curl -s 127.0.0.1:9300/metrics | grep ^bash
 bash{container_name="sti-build",job="job1",namespace="service-activator",pod_name="samigrationpam-kieserver-26-build",verb:"row_count"} 3596
 bash{container_name="sti-build",job="job1",namespace="service-activator",pod_name="samigrationpam-kieserver-26-build",verb:"row_count"} 3721
 bash{container_name="sti-build",job="job1",namespace="service-activator",pod_name="samigrationpam-kieserver-26-build",verb:"row_count"} 3802
